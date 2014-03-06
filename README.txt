@@ -76,7 +76,7 @@ Options
 *-p* ::
     Run CMVS/PMVS
 *-g* ::
-    Run the work flow in geo-accurate mode
+    Run GTransform
 *-k* ::
     Prevent the script from running cleanup. This will keep all the output of
     siftGPU, Bundler, CMVS/PMVS, and GTransform.
