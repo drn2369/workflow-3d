@@ -1,0 +1,15 @@
+Change Log
+=========
+
+v2.0 4/6/2014
+--------------
+-Moved Georegistraion process to GTransform
+
+v1.1 5/3/2012
+--------------
+-Fixed bug in siftGPU and in .pos file creation (Thanks Brian O.)
+
+v1.0 4/16/2012
+--------------
+
+-Launched website and code

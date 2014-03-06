@@ -1,0 +1,197 @@
+Installation
+============
+
+This work flow has been successfully tested and run on the following systems:
+
+-----------------------------------------------------------------------------------------------------------------------
+-Intel Core i5-2400 3.10Ghz Quad Core, 8 GB RAM, nVidia  GTX 460 V2 Fermi 1GB 336 processing cores
+-Intel Pentium G6950 2.8Ghz Dual Core, 16 GB RAM, nVidia Tesla C1060 4GB 240 processing cores
+-(Dual) Intel Xeon X5680 3.33Ghz Hex Core Hyper-threaded, 72GB RAM, nVidia GT430 2GB 96 processing cores
+-----------------------------------------------------------------------------------------------------------------------
+
+.Requirements
+- This work flow is quite computationally expensive when dealing with large
+  image sets, therefore the system that it should be run on should be a 64-bit
+  system with at least 4 GB of RAM. 
+- This work flow also uses a GPU accelerated version of SIFT, so the system
+  also needs a CUDA-capable NVIDIA GPU.
+  * The libraries which siftGPU use can be run with both CUDA and OpenGL-based GPUs
+    however an OpenGL-based GPU has not been tested with this work flow.
+
+The following shows the steps for installing this work flow on a fresh install
+of Fedora 16 64-bit, with a CUDA-capable GPU. It is assumed that the user has root access.
+
+.Installation Steps
+- A number of dependencies are used in this work flow, the following can be
+installed using yum
+
+----------------------------------------------------------------------------
+Update
+
+$ sudo yum update -y --skip-broken
+
+Reboot if needed then perform the the following command
+
+$ sudo yum install git patch make gcc-c++ freeglut-devel libXi-devel
+libXmu-devel DevIL-devel boost-devel gsl-devel libjpeg-devel
+lapack-devel zlib-devel
+
+----------------------------------------------------------------------------
+
+- The proper NVIDIA drivers and CUDA have to be installed, this process can
+  vary across systems. The following steps (taken from 
+  link:http://reset.etsii.upm.es/en/users/peque/installing-cuda-in-fedora-16/[here]) 
+  were found to work with a standard kernel.
+- Install the RPM fusion repositories 
+-----------------------------------------------------------------------------------------
+$ sudo yum localinstall --nogpgcheck
+http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-stable.noarch.rpm
+http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-stable.noarch.rpm
+-----------------------------------------------------------------------------------------
+
+  * Install the NVIDIA drivers 
+------------------------------------------------------
+$ sudo yum install kmod-nvidia akmod-nvidia kernel-devel
+------------------------------------------------------
+
+  * Back up the initramfs image and generate a new one 
+------------------------------------------------------------------------------
+$ sudo mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname-r).nouveau.img
+$ sudo dracut /boot/initramfs-$(uname -r).img $(uname -r)
+------------------------------------------------------------------------------
+
+  * Run nvidia-xconfig
+-------------------
+$ sudo nvidia-xconfig
+-------------------
+
+- Reboot and then download the
+  link:http://developer.nvidia.com/cuda-toolkit-41[Cuda Tool Kit for Fedora]
+- Make the CUDA tool kit executable and install it as root. 
+  * NOTE: If you install CUDA to a place other than the default (/usr/local/)
+    keep track of this, you will need it. You will also need to change all
+    /usr/local/cuda paths in the rest of the installation process to your
+    chosen path
+--------------------
+$ chmod +x cudatoolkit
+$ sudo cudatoolkit
+--------------------
+- Edit line 80 of the CUDA host_config file to allow for gcc 4.6 to be used
+
+.In /usr/local/cuda/include/host_config.h
+---------------------------------------------------------
+Change Line 80 to:
+
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 7)
+---------------------------------------------------------
+
+- Add the following to your ~/.bashrc file then reload the shell to update the
+  environment variables. 
+
+.In ~/.bashrc
+---------------------------------------------------------------------------------
+export PATH=$PATH:/usr/local/cuda/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib:/usr/local/cuda/lib64
+---------------------------------------------------------------------------------
+
+- link:http://glew.sourceforge.net/[GLEW] has to be built from source for
+  http://cs.unc.edu/~ccwu/siftgpu/[siftGPU]. Clone the source into a directory
+  of your choice. Then build and install it.
+
+------------------------------------------------------------
+$ git clone git://glew.git.sourceforge.net/gitroot/glew/glew
+$ cd glew/auto/
+$ make
+$ cd ../
+$ sudo make install
+------------------------------------------------------------
+
+- Download http://cs.unc.edu/~ccwu/siftgpu/[siftGPU] from the site, then go
+  into the siftGPU directory and run make.
+  * NOTE: If you installed cuda to anywhere besides /usr/local you will have
+    to edit line 11 of the makefile to reflect that.
+
+------------
+$ cd SiftGPU
+$ make
+------------
+
+- Then move the compiled library to /usr/lib and copy the headers to
+  /usr/include
+
+-----------------------------------------
+$ sudo mv bin/libsiftgpu.so /usr/lib
+$ sudo cp -p src/SiftGPU/*.h /usr/include
+-----------------------------------------
+
+- Next version 1.2 of
+  http://www.cs.utexas.edu/users/dml/Software/graclus.html[Graclus] needs to
+  be downloaded for
+  http://grail.cs.washington.edu/software/cmvs/documentation.html[CMVS]. Once
+  downloaded, edit the Makefile.in varible DNUMBITS to equal 64 instead of 32
+
+.In graclus1.2/Makefile.in
+--------------------------
+Change line 11 to:
+
+COPTIONS = -DNUMBITS=64
+--------------------------
+  
+- Run make in the graclus directory, move the compiled libraries
+  to /usr/lib and the metis header files to /usr/include
+
+--------------------------------------
+$ cd graclus1.2
+$ make
+$ sudo mv *.a /usr/lib
+$ sudo cp -p metisLib/*.h /usr/include
+--------------------------------------
+
+- Clone our 3d-work flow into a working directory and run the setup for
+  the source tree. This set up will download the source files for
+  http://phototour.cs.washington.edu/bundler/[Bundler],
+  http://grail.cs.washington.edu/software/pmvs/[PMVS2], and
+  http://grail.cs.washington.edu/software/cmvs/[CMVS] from their respective
+  websites. It will then apply the provided patches to the source code in
+  order to replicate the source tree that we use.
+
+--------------------------------------------
+$ git clone https://github.com/drn2369/workflow-3d.git
+$ cd workflow-3d/src
+$ sh setup.sh
+--------------------------------------------
+
+- Run make and the binaries should compile and be placed in ../bin 
+
+------
+$ make
+------
+
+- Move libANN_char.so to /usr/lib and run ldconfig to update the
+  links
+
+-------------------------------------------------------
+sudo mv bundler-v0.4-source/lib/libANN_char.so /usr/lib
+sudo ldconfig
+-------------------------------------------------------
+
+- Finally, update the path in the RunProcess script in workflow-3d/scripts/ so
+  the base path is the full path to workflow-3d
+
+.In RunProcess.sh:
+----------------------------------
+BASEPATH=/full/path/to/workflow-3d
+
+BINPATH=$BASEPATH/bin
+SCRIPTPATH=$BASEPATH/scripts
+
+SIFT=$BINPATH/siftGPU
+MATCHKEYS=$BINPATH/KeyMatchFull
+BUNDLER=$BINPATH/bundler
+BUNDLE2PMVS=$BINPATH/Bundle2PMVS
+CMVS=$BINPATH/cmvs
+GENOP=$BINPATH/genOption
+----------------------------------
+  
+- Check the link:userguide.html[User Guide] on how to run the work flow on the
+  provided test data.
