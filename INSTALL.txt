@@ -34,7 +34,7 @@ Reboot if needed then perform the the following command
 
 $ sudo yum install git patch make gcc-c++ freeglut-devel libXi-devel
 libXmu-devel DevIL-devel boost-devel gsl-devel libjpeg-devel
-lapack-devel zlib-devel
+lapack-devel zlib-devel opencv opencv-devel
 
 ----------------------------------------------------------------------------
 

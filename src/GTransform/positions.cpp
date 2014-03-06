@@ -54,13 +54,13 @@ void Positions::readPositions(){
 	}
 
 	//TEST WRITE OUT STUFF
-	for(int i = 0; i < camPositions.size(); i++){
+/*	for(int i = 0; i < camPositions.size(); i++){
 		cout << camPositions[i].first << endl;
 	}
 	for(int i = 0; i < camPositions.size(); i++){
 		cout << camPositions[i].second << endl;
 	}
-
+*/
 
 }
 
