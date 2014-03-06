@@ -100,7 +100,7 @@ Options
     Set the max cluster size for CMVS.
 *-l = 1* ::
     Set the level for PMVS.
-*-c = 2* ::
+*-e = 2* ::
     Set the cell size for PMVS.
 *-t = 0.7* ::
     Set the threshold for PMVS.
