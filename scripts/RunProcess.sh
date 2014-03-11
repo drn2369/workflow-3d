@@ -303,7 +303,8 @@ if $RUN_GTRANS; then
 	mkdir -p trans
 	mkdir -p trans/models/
 	mkdir -p trans/txt/
-
+	
+	mv transform.txt trans/
 	mv models/*-trans.ply trans/models/
 	mv txt/*-trans.txt trans/txt/
 
@@ -332,7 +333,7 @@ echo "[- Clean Up -]"
 
 	if $RUN_PMVS; then
 	 rm -rf bundle/
-	 mv -f pmvs/trans/ results/
+	 mv -f pmvs/transform.txt resultsdd
 	 tar -czf results/backup/plys.tar.gz pmvs/models/*ply pmvs/*ply
 	 tar -czf results/backup/patches.tar.gz pmvs/models/*patch 
 	 tar -czf results/backup/psets.tar.gz pmvs/models/*pset
