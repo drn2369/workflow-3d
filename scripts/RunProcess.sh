@@ -118,7 +118,7 @@ while getopts "asbpgkd:f:i:c:l:e:t:w:m:u:x:y:" flag; do
 	k)DEL_ON=false;;
 	d)_DEVICE_NUM=$OPTARG;;
 	x)_MAX_D=$OPTARG;;
-	f)_MAX_F=$OPTARG;;
+	y)_MAX_F=$OPTARG;;
 	f)_FOCAL=$OPTARG;;
 	i)_CONSTRAIN_F_WEIGHT=$OPTARG;;
 	c)_MAX_CLUSTER_SIZE=$OPTARG;;
